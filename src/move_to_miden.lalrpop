@@ -1,0 +1,46 @@
+use std::str::FromStr;
+use crate::ast::*;
+
+grammar;
+
+pub Module: Module = {
+    <functions:Function*> => Module { functions },
+};
+
+Function: Function = {
+    "fun" <name:Identifier> "(" <parameters:Comma<Parameter>> ")" "->" <return_type:Type> "{" <body:Expression> "}" =>
+        Function { name, parameters, return_type, body },
+};
+
+Parameter: Parameter = {
+    <name:Identifier> ":" <typ:Type> => Parameter { name, typ },
+};
+
+Type: Type = {
+    "u64" => Type::U64,
+};
+
+Expression: Expression = {
+    <l:Factor> "+" <r:Expression> => Expression::Add(Box::new(l), Box::new(r)),
+    Factor,
+};
+
+Factor: Expression = {
+    Identifier => Expression::Variable(<>),
+    Number => Expression::Literal(<>),
+    "(" <Expression> ")",
+};
+
+Identifier: String = r"[a-zA-Z_][a-zA-Z0-9_]*" => String::from(<>);
+Number: u64 = r"[0-9]+" => u64::from_str(<>).unwrap();
+
+Comma<T>: Vec<T> = {
+    <v:(<T> ",")*> <e:T?> => match e {
+        None => v,
+        Some(e) => {
+            let mut v = v;
+            v.push(e);
+            v
+        }
+    }
+};
