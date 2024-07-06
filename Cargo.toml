@@ -1,12 +1,17 @@
 [package]
-name = "move_to_miden_compiler"
+name = "move_compiler"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-lalrpop = "0.19.7"
-lalrpop-util = "0.19.7"
-regex = "1"
+# Move dependencies from Sui repository
+move-core-types = { git = "https://github.com/MystenLabs/sui/tree/main/external-crates/move", rev = "main" }
+
+# Other useful dependencies
+anyhow = "1.0"
+clap = { version = "4.1", features = ["derive"] }
+log = "0.4"
+env_logger = "0.9"
 
 [build-dependencies]
 lalrpop = "0.19.7"

@@ -94,6 +94,26 @@ Understand this ...
 2. My second instinct was to do Move Bytecode -> Miden via their SSA API
 3. The above task was somewhat beyond the scope of my current class
 4. What I'd like to end up doing now is to make a basic Move Bytecode to MASM transpiler
-5. I should really be using their internal tooling if I want to make this production ready, but I don't have the time or the bandwidth to do that
+5. I should really be using their internal tooling if I want to make this production ready,
+   but I don't have the time or the bandwidth to do that
+6. I think something that would be a lot of fun is for me to write an actual Move to Miden compiler.
+   in this case, maybe I can get hired by Mysten labs or Polygon lol
 
 ## Todo
+
+- [ ] Import each Move crate into my project
+- [ ] Modify the necessary files to complete the translation
+
+## Notes
+
+- For Move -> Miden compilation, we use the stack machine representation of the bytecode
+  because Miden VM is a stack machine
+- We are NOT doing the
+
+## Important
+
+- move-binary-format/src/file_format.rs
+
+### Move Addresses
+
+Every Sui Move address has a separate address on the blockchain. It's a global shared state that you have access to

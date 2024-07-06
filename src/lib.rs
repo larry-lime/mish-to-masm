@@ -1,5 +1,6 @@
 pub mod ast;
 pub mod codegen;
+pub mod ir;
 pub mod parser;
 
 use lalrpop_util::lalrpop_mod;

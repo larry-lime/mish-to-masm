@@ -8,7 +8,7 @@ pub Module: Module = {
 };
 
 Function: Function = {
-    "fun" <name:Identifier> "(" <parameters:Comma<Parameter>> ")" "->" <return_type:Type> "{" <body:Expression> "}" =>
+    "fun" <name:Identifier> "(" <parameters:Comma<Parameter>> ")" ":" <return_type:Type> "{" <body:Expression> "}" =>
         Function { name, parameters, return_type, body },
 };
 

@@ -1,51 +1,49 @@
 use crate::ast::*;
+use crate::ir::{MidenInstruction, MidenProgram};
+use std::collections::HashMap;
 
 pub fn generate(module: &Module) -> String {
-    let mut output = String::new();
+    let mut program = MidenProgram::new();
     for function in &module.functions {
-        generate_function(&mut output, function);
+        generate_function(&mut program, function);
     }
-    output
+    program.to_string()
 }
 
-fn generate_function(output: &mut String, func: &Function) {
-    output.push_str(&format!("proc.{}.{}\n", func.name, func.parameters.len()));
+fn generate_function(program: &mut MidenProgram, func: &Function) {
+    program.add_instruction(MidenInstruction::Proc(func.name.clone()));
 
-    // Generate code for parameters
-    for param in &func.parameters {
-        output.push_str(&format!(
-            "    # Parameter: {} ({})\n",
-            param.name,
-            type_to_string(&param.typ)
-        ));
+    let mut vars = HashMap::new();
+
+    for (index, param) in func.parameters.iter().enumerate() {
+        vars.insert(param.name.clone(), index);
     }
 
-    // Generate code for function body
-    generate_expression(output, &func.body);
+    generate_expression(program, &func.body, &mut vars);
 
-    output.push_str("    # Return value is on top of the stack\n");
-    output.push_str("end\n\n");
+    program.add_instruction(MidenInstruction::End);
 }
 
-fn generate_expression(output: &mut String, expr: &Expression) {
+fn generate_expression(
+    program: &mut MidenProgram,
+    expr: &Expression,
+    vars: &mut HashMap<String, usize>,
+) {
     match expr {
         Expression::Add(left, right) => {
-            generate_expression(output, left);
-            generate_expression(output, right);
-            output.push_str("    add\n");
+            generate_expression(program, left, vars);
+            generate_expression(program, right, vars);
+            program.add_instruction(MidenInstruction::Add);
         }
         Expression::Variable(name) => {
-            output.push_str(&format!("    # Load variable {}\n", name));
-            // You'll need to implement proper variable handling
+            if let Some(&index) = vars.get(name) {
+                program.add_instruction(MidenInstruction::Push(index as u64));
+            } else {
+                panic!("Variable not found: {}", name);
+            }
         }
         Expression::Literal(value) => {
-            output.push_str(&format!("    push.{}\n", value));
+            program.add_instruction(MidenInstruction::Push(*value));
         }
-    }
-}
-
-fn type_to_string(typ: &Type) -> &'static str {
-    match typ {
-        Type::U64 => "u64",
     }
 }
